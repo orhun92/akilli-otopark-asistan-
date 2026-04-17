@@ -5,6 +5,9 @@ const parkingList = document.getElementById("parkingList");
 
 let userLocation = null;
 let showAll = false;
+let map;
+let userMarker;
+let parkingMarkers = [];
 
 let parkings = [
   {
@@ -65,6 +68,64 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return Number((R * c).toFixed(2));
 }
 
+function initMap() {
+  map = L.map("map").setView([41.0082, 28.9784], 13);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  renderParkingMarkers();
+}
+
+function clearParkingMarkers() {
+  parkingMarkers.forEach(marker => map.removeLayer(marker));
+  parkingMarkers = [];
+}
+
+function renderParkingMarkers() {
+  if (!map) return;
+
+  clearParkingMarkers();
+
+  let list = [...parkings];
+  if (!showAll) {
+    list = list.filter(parking => parking.status === "available");
+  }
+
+  list.forEach(parking => {
+    const popupText = `
+      <b>${parking.name}</b><br>
+      Kapasite: ${parking.capacity}<br>
+      Boş Yer: ${parking.emptySlots}<br>
+      Durum: ${parking.status === "available" ? "Boş Yer Var" : "Dolu"}<br><br>
+      <button onclick="navigateToParking(${parking.lat}, ${parking.lng})">Navigasyon</button>
+    `;
+
+    const marker = L.marker([parking.lat, parking.lng])
+      .addTo(map)
+      .bindPopup(popupText);
+
+    parkingMarkers.push(marker);
+  });
+}
+
+function updateUserMarker() {
+  if (!map || !userLocation) return;
+
+  if (userMarker) {
+    map.removeLayer(userMarker);
+  }
+
+  userMarker = L.marker([userLocation.lat, userLocation.lng])
+    .addTo(map)
+    .bindPopup("Konumunuz")
+    .openPopup();
+
+  map.setView([userLocation.lat, userLocation.lng], 14);
+}
+
 function getSortedParkings() {
   const sorted = [...parkings];
 
@@ -90,6 +151,7 @@ function renderParkings() {
 
   if (sortedParkings.length === 0) {
     parkingList.innerHTML = '<p class="empty-message">Gösterilecek uygun otopark bulunamadı.</p>';
+    renderParkingMarkers();
     return;
   }
 
@@ -124,6 +186,8 @@ function renderParkings() {
 
     parkingList.appendChild(div);
   });
+
+  renderParkingMarkers();
 }
 
 function toggleParkingStatus(id) {
@@ -150,7 +214,7 @@ function toggleParkingStatus(id) {
 }
 
 function navigateToParking(lat, lng) {
-  const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+  const mapsUrl = https://www.google.com/maps?q=${lat},${lng};
   window.open(mapsUrl, "_blank");
 }
 
@@ -167,7 +231,9 @@ getLocationBtn.addEventListener("click", () => {
         lng: position.coords.longitude
       };
 
-      locationText.textContent = `Enlem: ${userLocation.lat.toFixed(4)}, Boylam: ${userLocation.lng.toFixed(4)}`;
+      locationText.textContent = Enlem: ${userLocation.lat.toFixed(4)}, Boylam: ${userLocation.lng.toFixed(4)};
+
+      updateUserMarker();
       renderParkings();
     },
     () => {
@@ -182,4 +248,5 @@ showAllBtn.addEventListener("click", () => {
   renderParkings();
 });
 
+initMap();
 renderParkings();
