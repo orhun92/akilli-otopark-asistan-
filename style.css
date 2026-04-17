@@ -61,15 +61,17 @@ button {
   background: #1f6feb;
   color: #fff;
   font-size: 15px;
-  transition: 0.2s;
-}
-
-button:hover {
-  opacity: 0.9;
 }
 
 .secondary-btn {
   background: #4b5563;
+}
+
+#map {
+  width: 100%;
+  height: 400px;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .parking-item {
@@ -124,36 +126,7 @@ button:hover {
   min-width: 150px;
 }
 
-.actions button {
-  margin-top: 0;
-}
-
 .empty-message {
   color: #666;
   padding: 10px 0;
-}
-
-@media (max-width: 600px) {
-  .header h1 {
-    font-size: 26px;
-  }
-
-  .parking-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .actions {
-    width: 100%;
-  }
-
-  .actions button {
-    width: 100%;
-  }
-}
-#map {
-  width: 100%;
-  height: 400px;
-  border-radius: 12px;
-  overflow: hidden;
 }
