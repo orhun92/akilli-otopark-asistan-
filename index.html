@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Akıllı Otopark Asistanı</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Akıllı Otopark Asistanı</h1>
+      <p>Yakındaki uygun park yerlerini kolayca bul</p>
+    </header>
+
+    <section class="card">
+      <h2>Konum Bilgisi</h2>
+      <p id="locationText">Konum alınmadı</p>
+      <button id="getLocationBtn">Konumumu Al</button>
+    </section>
+
+    <section class="card">
+      <div class="section-title">
+        <h2>Yakındaki Otoparklar</h2>
+        <button id="showAllBtn" class="secondary-btn">Tümünü Göster</button>
+      </div>
+      <div id="parkingList"></div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
