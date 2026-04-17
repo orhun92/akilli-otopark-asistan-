@@ -5,8 +5,8 @@ const parkingList = document.getElementById("parkingList");
 
 let userLocation = null;
 let showAll = false;
-let map;
-let userMarker;
+let map = null;
+let userMarker = null;
 let parkingMarkers = [];
 
 let parkings = [
@@ -72,8 +72,8 @@ function initMap() {
   map = L.map("map").setView([41.0082, 28.9784], 13);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
+    attribution: "&copy; OpenStreetMap contributors",
+    maxZoom: 19
   }).addTo(map);
 
   renderParkingMarkers();
@@ -89,24 +89,20 @@ function renderParkingMarkers() {
 
   clearParkingMarkers();
 
-  let list = [...parkings];
+  let visibleParkings = [...parkings];
+
   if (!showAll) {
-    list = list.filter(parking => parking.status === "available");
+    visibleParkings = visibleParkings.filter(p => p.status === "available");
   }
 
-  list.forEach(parking => {
-    const popupText = `
-      <b>${parking.name}</b><br>
-      Kapasite: ${parking.capacity}<br>
-      Boş Yer: ${parking.emptySlots}<br>
-      Durum: ${parking.status === "available" ? "Boş Yer Var" : "Dolu"}<br><br>
-      <button onclick="navigateToParking(${parking.lat}, ${parking.lng})">Navigasyon</button>
-    `;
-
-    const marker = L.marker([parking.lat, parking.lng])
-      .addTo(map)
-      .bindPopup(popupText);
-
+  visibleParkings.forEach(parking => {
+    const marker = L.marker([parking.lat, parking.lng]).addTo(map);
+    marker.bindPopup(
+      "<b>" + parking.name + "</b><br>" +
+      "Kapasite: " + parking.capacity + "<br>" +
+      "Boş Yer: " + parking.emptySlots + "<br>" +
+      "Durum: " + (parking.status === "available" ? "Boş Yer Var" : "Dolu")
+    );
     parkingMarkers.push(marker);
   });
 }
@@ -118,10 +114,8 @@ function updateUserMarker() {
     map.removeLayer(userMarker);
   }
 
-  userMarker = L.marker([userLocation.lat, userLocation.lng])
-    .addTo(map)
-    .bindPopup("Konumunuz")
-    .openPopup();
+  userMarker = L.marker([userLocation.lat, userLocation.lng]).addTo(map);
+  userMarker.bindPopup("Konumunuz").openPopup();
 
   map.setView([userLocation.lat, userLocation.lng], 14);
 }
@@ -161,8 +155,12 @@ function renderParkings() {
 
     let distanceText = "Mesafe hesaplanamadı";
     if (userLocation) {
-      const distance = calculateDistance(userLocation.lat, userLocation.lng, parking.lat, parking.lng);
-      distanceText = distance + " km";
+      distanceText = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        parking.lat,
+        parking.lng
+      ) + " km";
     }
 
     div.innerHTML = `
@@ -214,7 +212,7 @@ function toggleParkingStatus(id) {
 }
 
 function navigateToParking(lat, lng) {
-  const mapsUrl = https://www.google.com/maps?q=${lat},${lng};
+  const mapsUrl = "https://www.google.com/maps?q=" + lat + "," + lng;
   window.open(mapsUrl, "_blank");
 }
 
@@ -231,7 +229,9 @@ getLocationBtn.addEventListener("click", () => {
         lng: position.coords.longitude
       };
 
-      locationText.textContent = Enlem: ${userLocation.lat.toFixed(4)}, Boylam: ${userLocation.lng.toFixed(4)};
+      locationText.textContent =
+        "Enlem: " + userLocation.lat.toFixed(4) +
+        ", Boylam: " + userLocation.lng.toFixed(4);
 
       updateUserMarker();
       renderParkings();
