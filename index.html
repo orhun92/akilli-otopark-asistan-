@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Akıllı Otopark Asistanı</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 </head>
 <body>
   <div class="container">
@@ -20,6 +26,11 @@
     </section>
 
     <section class="card">
+      <h2>Harita</h2>
+      <div id="map"></div>
+    </section>
+
+    <section class="card">
       <div class="section-title">
         <h2>Yakındaki Otoparklar</h2>
         <button id="showAllBtn" class="secondary-btn">Tümünü Göster</button>
@@ -28,6 +39,8 @@
     </section>
   </div>
 
-  <script src="uygulama.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
