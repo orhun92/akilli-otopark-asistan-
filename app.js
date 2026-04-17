@@ -10,42 +10,10 @@ let userMarker = null;
 let parkingMarkers = [];
 
 let parkings = [
-  {
-    id: 1,
-    name: "Merkez Otopark",
-    lat: 41.0082,
-    lng: 28.9784,
-    status: "available",
-    capacity: 50,
-    emptySlots: 12
-  },
-  {
-    id: 2,
-    name: "Meydan Katlı Otopark",
-    lat: 41.0150,
-    lng: 28.9850,
-    status: "full",
-    capacity: 100,
-    emptySlots: 0
-  },
-  {
-    id: 3,
-    name: "AVM Açık Otopark",
-    lat: 41.0035,
-    lng: 28.9720,
-    status: "available",
-    capacity: 80,
-    emptySlots: 20
-  },
-  {
-    id: 4,
-    name: "Sahil Otoparkı",
-    lat: 41.0200,
-    lng: 28.9900,
-    status: "available",
-    capacity: 60,
-    emptySlots: 8
-  }
+  { id: 1, name: "Merkez Otopark", lat: 41.0082, lng: 28.9784, status: "available", capacity: 50, emptySlots: 12 },
+  { id: 2, name: "Meydan Katlı Otopark", lat: 41.0150, lng: 28.9850, status: "full", capacity: 100, emptySlots: 0 },
+  { id: 3, name: "AVM Açık Otopark", lat: 41.0035, lng: 28.9720, status: "available", capacity: 80, emptySlots: 20 },
+  { id: 4, name: "Sahil Otoparkı", lat: 41.0200, lng: 28.9900, status: "available", capacity: 60, emptySlots: 8 }
 ];
 
 function toRad(value) {
@@ -80,7 +48,9 @@ function initMap() {
 }
 
 function clearParkingMarkers() {
-  parkingMarkers.forEach(marker => map.removeLayer(marker));
+  parkingMarkers.forEach(function(marker) {
+    map.removeLayer(marker);
+  });
   parkingMarkers = [];
 }
 
@@ -89,20 +59,24 @@ function renderParkingMarkers() {
 
   clearParkingMarkers();
 
-  let visibleParkings = [...parkings];
+  let visibleParkings = parkings.slice();
 
   if (!showAll) {
-    visibleParkings = visibleParkings.filter(p => p.status === "available");
+    visibleParkings = visibleParkings.filter(function(p) {
+      return p.status === "available";
+    });
   }
 
-  visibleParkings.forEach(parking => {
+  visibleParkings.forEach(function(parking) {
     const marker = L.marker([parking.lat, parking.lng]).addTo(map);
-    marker.bindPopup(
+
+    const popupText =
       "<b>" + parking.name + "</b><br>" +
       "Kapasite: " + parking.capacity + "<br>" +
       "Boş Yer: " + parking.emptySlots + "<br>" +
-      "Durum: " + (parking.status === "available" ? "Boş Yer Var" : "Dolu")
-    );
+      "Durum: " + (parking.status === "available" ? "Boş Yer Var" : "Dolu");
+
+    marker.bindPopup(popupText);
     parkingMarkers.push(marker);
   });
 }
@@ -116,15 +90,14 @@ function updateUserMarker() {
 
   userMarker = L.marker([userLocation.lat, userLocation.lng]).addTo(map);
   userMarker.bindPopup("Konumunuz").openPopup();
-
   map.setView([userLocation.lat, userLocation.lng], 14);
 }
 
 function getSortedParkings() {
-  const sorted = [...parkings];
+  const sorted = parkings.slice();
 
   if (userLocation) {
-    sorted.sort((a, b) => {
+    sorted.sort(function(a, b) {
       const distA = calculateDistance(userLocation.lat, userLocation.lng, a.lat, a.lng);
       const distB = calculateDistance(userLocation.lat, userLocation.lng, b.lat, b.lng);
       return distA - distB;
@@ -140,7 +113,9 @@ function renderParkings() {
   let sortedParkings = getSortedParkings();
 
   if (!showAll) {
-    sortedParkings = sortedParkings.filter(parking => parking.status === "available");
+    sortedParkings = sortedParkings.filter(function(parking) {
+      return parking.status === "available";
+    });
   }
 
   if (sortedParkings.length === 0) {
@@ -149,38 +124,32 @@ function renderParkings() {
     return;
   }
 
-  sortedParkings.forEach((parking) => {
+  sortedParkings.forEach(function(parking) {
     const div = document.createElement("div");
     div.className = "parking-item";
 
     let distanceText = "Mesafe hesaplanamadı";
     if (userLocation) {
-      distanceText = calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        parking.lat,
-        parking.lng
-      ) + " km";
+      distanceText =
+        calculateDistance(userLocation.lat, userLocation.lng, parking.lat, parking.lng) + " km";
     }
 
-    div.innerHTML = `
-      <div class="parking-info">
-        <h3>${parking.name}</h3>
-        <p>Toplam Kapasite: ${parking.capacity}</p>
-        <p>Boş Yer: ${parking.emptySlots}</p>
-        <p>Mesafe: ${distanceText}</p>
-      </div>
-
-      <div class="actions">
-        <span class="status ${parking.status === "available" ? "available" : "full"}">
-          ${parking.status === "available" ? "Boş Yer Var" : "Dolu"}
-        </span>
-        <button onclick="navigateToParking(${parking.lat}, ${parking.lng})">Navigasyon</button>
-        <button onclick="toggleParkingStatus(${parking.id})">
-          ${parking.status === "available" ? "Dolu Yap" : "Boş Yap"}
-        </button>
-      </div>
-    `;
+    div.innerHTML =
+      '<div class="parking-info">' +
+        "<h3>" + parking.name + "</h3>" +
+        "<p>Toplam Kapasite: " + parking.capacity + "</p>" +
+        "<p>Boş Yer: " + parking.emptySlots + "</p>" +
+        "<p>Mesafe: " + distanceText + "</p>" +
+      "</div>" +
+      '<div class="actions">' +
+        '<span class="status ' + (parking.status === "available" ? "available" : "full") + '">' +
+          (parking.status === "available" ? "Boş Yer Var" : "Dolu") +
+        "</span>" +
+        '<button onclick="navigateToParking(' + parking.lat + ',' + parking.lng + ')">Navigasyon</button>' +
+        '<button onclick="toggleParkingStatus(' + parking.id + ')">' +
+          (parking.status === "available" ? "Dolu Yap" : "Boş Yap") +
+        "</button>" +
+      "</div>";
 
     parkingList.appendChild(div);
   });
@@ -189,18 +158,26 @@ function renderParkings() {
 }
 
 function toggleParkingStatus(id) {
-  parkings = parkings.map((parking) => {
+  parkings = parkings.map(function(parking) {
     if (parking.id === id) {
       if (parking.status === "available") {
         return {
-          ...parking,
+          id: parking.id,
+          name: parking.name,
+          lat: parking.lat,
+          lng: parking.lng,
           status: "full",
+          capacity: parking.capacity,
           emptySlots: 0
         };
       } else {
         return {
-          ...parking,
+          id: parking.id,
+          name: parking.name,
+          lat: parking.lat,
+          lng: parking.lng,
           status: "available",
+          capacity: parking.capacity,
           emptySlots: 5
         };
       }
@@ -216,14 +193,14 @@ function navigateToParking(lat, lng) {
   window.open(mapsUrl, "_blank");
 }
 
-getLocationBtn.addEventListener("click", () => {
+getLocationBtn.addEventListener("click", function() {
   if (!navigator.geolocation) {
     locationText.textContent = "Tarayıcınız konum özelliğini desteklemiyor.";
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
-    (position) => {
+    function(position) {
       userLocation = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
@@ -236,13 +213,13 @@ getLocationBtn.addEventListener("click", () => {
       updateUserMarker();
       renderParkings();
     },
-    () => {
+    function() {
       locationText.textContent = "Konum alınamadı. Lütfen izin verin.";
     }
   );
 });
 
-showAllBtn.addEventListener("click", () => {
+showAllBtn.addEventListener("click", function() {
   showAll = !showAll;
   showAllBtn.textContent = showAll ? "Sadece Boşları Göster" : "Tümünü Göster";
   renderParkings();
